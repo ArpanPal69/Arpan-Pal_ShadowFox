@@ -40,25 +40,55 @@ Agentic-RAG/
 │   └── Dockerfile             # Containerization
 │
 ├── docker-compose.yml         # Container orchestration
-├── start.bat                  # One-click Windows setup
-├── start.sh                   # One-click Mac/Linux setup
 └── README.md                  
 ```
 
 ## 💻 5. Running Commands
 We have engineered this project for **reproducibility** and easy setup on any machine.
 
-### Option 1: One-Click Local Setup (Windows)
-Automatically creates a `venv`, installs dependencies, and boots the servers.
-```cmd
-start.bat
+### Option 1: Manual Local Setup (Terminal)
+If you prefer not to use Docker, you can run the project locally using Python.
+
+**1. Create and Activate a Virtual Environment**
+*   **Windows:**
+    ```cmd
+    python -m venv venv
+    venv\Scripts\activate
+    ```
+*   **Mac/Linux:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+**2. Install Dependencies**
+```bash
+pip install --upgrade pip
+pip install -r backend/requirements.txt
+pip install -r frontend/requirements.txt
 ```
 
-### Option 2: One-Click Local Setup (Linux / Mac)
+**3. Start the FastAPI Backend**
+Open a terminal (ensure your `venv` is activated) and run:
 ```bash
-chmod +x start.sh
-./start.sh
+cd backend
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
+
+**4. Start the Streamlit Frontend**
+Open a *second* terminal (activate the `venv` again) and run:
+*   **Windows:**
+    ```cmd
+    cd frontend
+    set "API_URL=http://127.0.0.1:8000"
+    python -m streamlit run app.py
+    ```
+*   **Mac/Linux:**
+    ```bash
+    cd frontend
+    export API_URL=http://127.0.0.1:8000
+    python -m streamlit run app.py
+    ```
 
 ### Option 3: Containerized Setup (Docker)
 For a completely isolated production environment:
