@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+langchain
+langchain-openai
+langchain-community
+langchain-text-splitters
+langgraph
+faiss-cpu
+sentence-transformers
+PyMuPDF
+unstructured
+python-multipart
+markdown
+python-dotenv

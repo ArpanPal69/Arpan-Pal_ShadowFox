@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  fastapi-backend:
+    build: ./backend
+    container_name: agentic-rag-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./backend:/app
+
+  streamlit-frontend:
+    build: ./frontend
+    container_name: agentic-rag-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://fastapi-backend:8000
+    depends_on:
+      - fastapi-backend
