@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
 import os
-
-API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000").strip()
 
 st.set_page_config(page_title="Agentic RAG Assistant", page_icon="🤖", layout="wide")
 
@@ -11,7 +10,7 @@ st.markdown("This application uses LangGraph, FastAPI, and FAISS to create a sel
 
 with st.sidebar:
     st.header("1. Setup")
-    openai_key = st.text_input("OpenAI API Key (Required)", type="password")
+    openai_key = st.text_input("OpenRouter API Key (Required)", type="password")
     
     st.header("2. Document Upload")
     uploaded_file = st.file_uploader("Upload PDF, TXT, or Markdown", type=['pdf', 'txt', 'md'])

@@ -38,7 +38,12 @@ def retrieve_node(state: AgentState):
 def grade_documents_node(state: AgentState):
     state["steps"].append("Grading documents for relevance using LLM.")
     filtered_docs = []
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=state["api_key"])
+    llm = ChatOpenAI(
+        model="openai/gpt-4o-mini", 
+        temperature=0, 
+        api_key=state["api_key"], 
+        base_url="https://openrouter.ai/api/v1"
+    )
     grader = llm.with_structured_output(GradeResult)
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a grader assessing relevance of a retrieved document to a user question. Answer True if it contains relevant information, False otherwise."),
@@ -68,7 +73,12 @@ def rewrite_query_node(state: AgentState):
         ("system", "You are an expert at optimizing user questions for vector store retrieval. Formulate a better question based on the original. Only output the new question."),
         ("human", "Original Question: {question}")
     ])
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=state["api_key"])
+    llm = ChatOpenAI(
+        model="openai/gpt-4o-mini", 
+        temperature=0, 
+        api_key=state["api_key"], 
+        base_url="https://openrouter.ai/api/v1"
+    )
     rewriter = prompt | llm
     better_query = rewriter.invoke({"question": state["question"]})
     return {"question": better_query.content}
@@ -80,14 +90,24 @@ def generate_node(state: AgentState):
         ("system", "You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\n\nContext:\n{context}"),
         ("human", "Question: {question}")
     ])
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=state["api_key"])
+    llm = ChatOpenAI(
+        model="openai/gpt-4o-mini", 
+        temperature=0, 
+        api_key=state["api_key"], 
+        base_url="https://openrouter.ai/api/v1"
+    )
     chain = prompt | llm
     answer = chain.invoke({"context": context, "question": state["question"]})
     return {"answer": answer.content}
 
 def hallucination_checker_node(state: AgentState):
     state["steps"].append("Checking answer for hallucinations.")
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=state["api_key"])
+    llm = ChatOpenAI(
+        model="openai/gpt-4o-mini", 
+        temperature=0, 
+        api_key=state["api_key"], 
+        base_url="https://openrouter.ai/api/v1"
+    )
     checker = llm.with_structured_output(HallucinationResult)
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a hallucination checker. Given the documents and an answer, evaluate if the answer is grounded ONLY in the facts present in the documents. Answer True if grounded, False if hallucinates."),

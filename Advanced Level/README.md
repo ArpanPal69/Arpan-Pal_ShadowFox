@@ -62,7 +62,9 @@ For a completely isolated and reproducible environment using Docker:
 docker-compose up --build
 ```
 
-**Note on Usage:** Once the Streamlit interface opens at `http://localhost:8501`, you must enter your **OpenAI API Key** in the sidebar. The system securely injects this key directly into the agent's state per-request, preventing data leakage and removing the need for manual `.env` file management.
+**Note on API Keys (Crucial):** This project is currently configured to use **OpenRouter** as the LLM routing provider to access the `gpt-4o-mini` model. Once the Streamlit interface opens at `http://localhost:8501`, you must enter an **OpenRouter API Key** (which starts with `sk-or-v1-...`) in the sidebar. 
+*   You can generate a key here: [https://openrouter.ai/](https://openrouter.ai/)
+*   **Warning:** A standard OpenAI key (`sk-proj-...`) will **not** work unless you revert the `base_url` configuration in `backend/agent.py`. The system securely injects this key directly into the agent's state per-request, preventing data leakage and removing the need for manual `.env` file management.
 
 ## 6. Results
 The implemented system drastically outperforms standard RAG:
