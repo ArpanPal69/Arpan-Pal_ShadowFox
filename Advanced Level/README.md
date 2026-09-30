@@ -101,6 +101,7 @@ docker-compose up --build
 ## 📊 6. Results & Observability
 The implemented system drastically outperforms standard demo applications:
 *   ✅ **Grounded Answer Generation:** The LLM is strictly constrained via prompting to generate answers *only* using the approved context.
+*   📝 **Comprehensive & Structured Answers:** Unlike boilerplate RAG tutorials that limit answers to 3 sentences, our generation prompt is heavily optimized to produce detailed, professional, and well-structured responses (using bullet points and deep explanations) tailored to complex queries.
 *   🚫 **Hallucinations Reduced:** A final "Hallucination Check" node mathematically evaluates the generated answer against the source text. If the agent detects that it made up facts, it refuses to answer.
 *   🔎 **Context Display & Citation Support:** The UI features an expandable section showing the exact source document, page number, and raw text chunk used to construct the answer.
 *   ⚡ **Streaming/Responsive Delivery:** The Streamlit frontend utilizes a custom text-streaming generator, typing out the final answer dynamically to provide a highly responsive, ChatGPT-like user experience.

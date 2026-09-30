@@ -87,7 +87,7 @@ def generate_node(state: AgentState):
     state["steps"].append("Generating answer based strictly on relevant documents.")
     context = "\n\n".join([f"Document {i+1} (Source: {doc.metadata.source}):\n{doc.text}" for i, doc in enumerate(state["documents"])])
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\n\nContext:\n{context}"),
+        ("system", "You are an advanced assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question comprehensively. If you don't know the answer, just say that you don't know. Provide detailed, well-structured answers using bullet points or paragraphs where appropriate to fully satisfy the user's query.\n\nContext:\n{context}"),
         ("human", "Question: {question}")
     ])
     llm = ChatOpenAI(
