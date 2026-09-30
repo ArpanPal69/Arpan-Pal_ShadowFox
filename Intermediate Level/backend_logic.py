@@ -9,7 +9,7 @@ from langchain_core.prompts import PromptTemplate
 from transformers import pipeline
 
 class RAGPipeline:
-    def __init__(self, api_key: str = None, model_type: str = "OpenAI"):
+    def __init__(self, api_key: str = None, model_type: str = "OpenAI", openrouter_model: str = None):
         self.api_key = api_key
         self.model_type = model_type
         
@@ -18,6 +18,24 @@ class RAGPipeline:
                 raise ValueError("OpenAI API key is required for OpenAI models.")
             self.embeddings_model = OpenAIEmbeddings(openai_api_key=api_key)
             self.llm = ChatOpenAI(temperature=0, openai_api_key=api_key)
+        elif model_type == "OpenRouter":
+            if not api_key:
+                raise ValueError("OpenRouter API key is required.")
+            # Use local embeddings to ensure compatibility and keep it free
+            self.embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+            
+            # Fallback to a known free model if none provided
+            or_model = openrouter_model if openrouter_model else "openrouter/free"
+            self.llm = ChatOpenAI(
+                model=or_model,
+                temperature=0, 
+                openai_api_key=api_key, 
+                base_url="https://openrouter.ai/api/v1",
+                default_headers={
+                    "HTTP-Referer": "https://github.com/",
+                    "X-Title": "RAG Assistant"
+                }
+            )
         elif model_type == "HuggingFace (Local)":
             # Local embeddings (downloaded automatically)
             self.embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -35,7 +53,7 @@ class RAGPipeline:
             raise ValueError(f"Unsupported model type: {model_type}")
         
         # In-memory temporary directory for Chroma DB (auto-cleans on exit)
-        self._temp_dir = tempfile.TemporaryDirectory()
+        self._temp_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.persist_directory = self._temp_dir.name
         
         # Configure Chroma to use cosine distance
@@ -71,8 +89,8 @@ class RAGPipeline:
 
     def answer_query(self, user_query: str):
         """Handles Retrieval, Prompting, and Generation with Confidence Scoring"""
-        # Similarity search (k=3 for top 3 matches)
-        docs_with_scores = self.vector_store.similarity_search_with_score(user_query, k=3)
+        # Similarity search (k=8 to ensure broader context retrieval for comprehensive questions)
+        docs_with_scores = self.vector_store.similarity_search_with_score(user_query, k=8)
         
         context_text = ""
         sources = []
@@ -102,10 +120,16 @@ class RAGPipeline:
                 "sources": []
             }
 
-        # Strict Grounding Prompt
+        # Strict Grounding Prompt with Synthesis Instructions
         prompt_template = """
-You are an expert assistant. Use ONLY the following retrieved context to answer the user's question.
+You are an expert AI assistant. Use ONLY the following retrieved context to answer the user's question.
 If you do not know the answer based on the context, say "I cannot find the answer in the provided document." Do not make up an answer.
+
+Important Instructions:
+- Do not simply copy and paste sentences verbatim from the context.
+- Use your intelligence to synthesize, summarize, and explain the information in your own words.
+- Structure your answer clearly (using headings or bullet points if it helps) to make it highly readable.
+- Maintain a helpful, conversational tone while staying 100% factual to the provided text.
 
 Context:
 {context}

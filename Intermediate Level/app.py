@@ -15,11 +15,14 @@ if "rag_pipeline" not in st.session_state:
 with st.sidebar:
     st.header("1. Configuration")
     
-    model_type = st.selectbox("Select Model Provider", ["OpenAI", "HuggingFace (Local)"])
+    model_type = st.selectbox("Select Model Provider", ["OpenAI", "OpenRouter", "HuggingFace (Local)"])
     
     api_key = None
-    if model_type == "OpenAI":
-        api_key = st.text_input("OpenAI API Key", type="password", help="Your key is not stored and is only used in memory.")
+    openrouter_model = None
+    if model_type in ["OpenAI", "OpenRouter"]:
+        api_key = st.text_input(f"{model_type} API Key", type="password", help="Your key is not stored and is only used in memory.")
+        if model_type == "OpenRouter":
+            openrouter_model = st.text_input("OpenRouter Model Slug", value="openrouter/free", help="Find free models at openrouter.ai/models?max_price=0")
     else:
         st.info("Using free local HuggingFace models. No API key required! Note: The first run may take a few minutes to download the models (~1GB).")
     
@@ -27,15 +30,15 @@ with st.sidebar:
     uploaded_files = st.file_uploader("Upload PDF or TXT files", type=["pdf", "txt"], accept_multiple_files=True)
     
     if st.button("Process Documents"):
-        if model_type == "OpenAI" and not api_key:
-            st.error("Please enter an OpenAI API Key first.")
+        if model_type in ["OpenAI", "OpenRouter"] and not api_key:
+            st.error(f"Please enter an {model_type} API Key first.")
         elif not uploaded_files:
             st.error("Please upload at least one file.")
         else:
             with st.spinner("Processing documents (extracting, chunking & embedding)..."):
                 try:
                     # Initialize the pipeline ONCE
-                    pipeline = RAGPipeline(api_key=api_key, model_type=model_type)
+                    pipeline = RAGPipeline(api_key=api_key, model_type=model_type, openrouter_model=openrouter_model)
                     
                     for uploaded_file in uploaded_files:
                         # Save the uploaded file temporarily to process it
@@ -55,9 +58,9 @@ with st.sidebar:
                 except Exception as e:
                     error_str = str(e)
                     if "insufficient_quota" in error_str or "429" in error_str or "credit_balance_exhausted" in error_str:
-                        st.error("💳 **Billing Error:** Your OpenAI account has run out of credits. Please add a minimum of $5.00 to your OpenAI billing dashboard to continue, or switch to the free 'HuggingFace (Local)' model provider in the sidebar.")
+                        st.error(f"💳 **Billing Error:** Your {model_type} account has run out of credits or rate limited. Please switch to the free 'HuggingFace (Local)' model provider in the sidebar.")
                     elif "AuthenticationError" in error_str or "401" in error_str:
-                        st.error("🔑 **Authentication Error:** The OpenAI API key provided is invalid. Please double-check your key.")
+                        st.error(f"🔑 **Authentication Error:** The {model_type} API key provided is invalid. Please double-check your key.")
                     else:
                         st.error(f"⚠️ Error processing document: {e}")
 
@@ -90,8 +93,8 @@ if st.button("Ask"):
             except Exception as e:
                 error_str = str(e)
                 if "insufficient_quota" in error_str or "429" in error_str or "credit_balance_exhausted" in error_str:
-                    st.error("💳 **Billing Error:** Your OpenAI account has run out of credits. Please add funds to your OpenAI billing dashboard to continue, or switch to the free 'HuggingFace (Local)' model provider in the sidebar.")
+                    st.error(f"💳 **Billing Error:** Your {st.session_state.rag_pipeline.model_type} account has run out of credits. Please switch to the free 'HuggingFace (Local)' model provider in the sidebar.")
                 elif "AuthenticationError" in error_str or "401" in error_str:
-                    st.error("🔑 **Authentication Error:** The OpenAI API key provided is invalid. Please double-check your key.")
+                    st.error(f"🔑 **Authentication Error:** The {st.session_state.rag_pipeline.model_type} API key provided is invalid. Please double-check your key.")
                 else:
                     st.error(f"⚠️ Error generating answer: {e}")
