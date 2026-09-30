@@ -1,4 +1,4 @@
-﻿# 🧠 AI-Powered Document-Based QA Assistant
+# 🧠 AI-Powered Document-Based QA Assistant
 
 ## 🛑 Problem Statement
 Students and researchers often need to parse through dense, lengthy documents (like research papers, textbooks, or lecture notes) to find specific information. Generic large language models (LLMs) can answer general questions but are not aware of the specific contents of these user-provided documents, often leading to hallucinations or incorrect information. There is a need for a targeted AI assistant that can strictly answer questions based *only* on the provided text, ensuring accuracy and reliability.
@@ -31,15 +31,17 @@ To ensure the final answer remains strictly tied to the document and does not dr
   3. Respond with "I cannot find the answer" if the context is insufficient.
 
 ### 5. Application Structuring & UI
-The frontend is built with **Streamlit** to provide a usable, intuitive AI-assisted student workflow. It handles invalid files and empty queries gracefully, catches API billing errors dynamically, and most importantly, features **Source Context Visibility**â€”users can expand accordions to read the exact raw chunks the AI used to formulate its answer, building complete trust in the system.
+The frontend is built with **Streamlit** to provide a usable, intuitive AI-assisted student workflow. It handles invalid files and empty queries gracefully, catches API billing errors dynamically, and most importantly, features **Source Context Visibility**—users can expand accordions to read the exact raw chunks the AI used to formulate its answer, building complete trust in the system.
 
 ## 📂 Folder Structure
 ```text
 RAG/
-â”œâ”€â”€ app.py                      # Main Streamlit frontend application
-â”œâ”€â”€ backend_logic.py            # Core RAG pipeline, embedding, and LLM logic
-â”œâ”€â”€ requirements.txt            # Python dependencies
-â””â”€â”€ README.md                   # Project documentation
+├── app.py                      # Main Streamlit frontend application
+├── backend_logic.py            # Core RAG pipeline, embedding, and LLM logic
+├── find_models.py              # Script to identify compatible models
+├── test_pipeline.py            # Pipeline testing script
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
 ```
 
 ## 🚀 Running Commands (Setup Instructions)
